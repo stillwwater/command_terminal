@@ -3,7 +3,7 @@ Unity Command Terminal
 
 A simple and  highly performant in-game Console for calling C# methods, and displaying output from the unity `Debug` class, while running the game.
 
-![gif](https://i.imgur.com/M6cRrCj.gif)
+![gif](./demo.gif)
 
 ## Usage
 
