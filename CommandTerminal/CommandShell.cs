@@ -64,14 +64,14 @@ namespace CommandTerminal
         }
 
         void TypeError(string expected_type) {
-            Terminal.Interpreter.IssueErrorMessage(
+            Terminal.Shell.IssueErrorMessage(
                 "Incorrect type for {0}, expected <{1}>",
                 String, expected_type
             );
         }
     }
 
-    public class CommandInterpreter
+    public class CommandShell
     {
         Dictionary<string, CommandInfo> commands = new Dictionary<string, CommandInfo>();
         List<CommandArg> arguments = new List<CommandArg>(); // Cache for performance
