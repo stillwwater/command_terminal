@@ -11,13 +11,13 @@ Command Terminal is based on [an implementation by Jonathan Blow](https://youtu.
 
 Copy the contents from [CommandTerminal](./CommandTerminal) to your Assets folder. Attach a `Terminal` Component to a game object. The console window can be opened with the backtick key.
 
-Enter `LS` or `HELP` in the console to view all available commands, use the up and down arrow keys to traverse the command history.
+Enter `HELP` in the console to view all available commands, use the up and down arrow keys to traverse the command history.
 
 ## Registering Commands
 
 There are 3 options to register commands to be used in the Command Terminal.
 
-#### 1. Using the RegisterCommand attribute:
+### 1. Using the RegisterCommand attribute:
 
 The command method must be static (public or non-public).
 
@@ -41,7 +41,7 @@ In this case the command name (`add`) will be inferred from the method name, you
 [RegisterCommand(Name = "MyAdd", Help = "Adds 2 numbers", MinArgCount = 2, MaxArgCount = 2)]
 ```
 
-#### 2. Using a FrontCommand method:
+### 2. Using a FrontCommand method:
 
 Here you still use the `RegisterCommand` attribute, but the arguments are handled in a separate method, prefixed with `FrontCommand`. This way, `MaxArgCount` and `MinArgCount` are automatically inferred.
 
@@ -64,7 +64,7 @@ static void FrontCommandAdd(CommandArg[] args) {
 }
 ```
 
-#### 3. Manually adding Commands:
+### 3. Manually adding Commands:
 
 `RegisterCommand` only works for static methods. If you want to use a non-static method, you may add the command manually.
 

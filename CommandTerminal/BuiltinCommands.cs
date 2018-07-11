@@ -14,17 +14,12 @@ namespace CommandTerminal
             Terminal.Logger.Clear();
         }
 
-        [RegisterCommand(Help = "Displays all Console Commands", MaxArgCount = 0)]
-        static void CommandLs(CommandArg[] args) {
-            foreach (var command in Terminal.Shell.Commands) {
-                Terminal.Log("{0}: {1}", command.Key.PadRight(16), command.Value.help);
-            }
-        }
-
-        [RegisterCommand(Help = "Displays help documentation of a Command", MaxArgCount = 1)]
+        [RegisterCommand(Help = "Lists all Commands or displays help documentation of a Command", MaxArgCount = 1)]
         static void CommandHelp(CommandArg[] args) {
             if (args.Length == 0) {
-                CommandLs(args);
+                foreach (var command in Terminal.Shell.Commands) {
+                    Terminal.Log("{0}: {1}", command.Key.PadRight(16), command.Value.help);
+                }
                 return;
             }
 
