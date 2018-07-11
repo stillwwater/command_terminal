@@ -3,18 +3,19 @@ using System.Text;
 using System.Collections;
 using UnityEngine.Assertions;
 
-namespace CommandTerminal
+namespace Noods.Framework.RuntimeConsole
 {
     public class Terminal : MonoBehaviour
     {
         [Range(0, 1)]
         [SerializeField]
-        float window_size = 0.33f;
+        float WindowHeight = 0.33f;
 
         [Range(100, 1000)]
         [SerializeField]
-        float window_open_close_speed = 500;
+        float ToggleSpeed = 500;
 
+        [SerializeField] string HotKey = "`";
         [SerializeField] bool Animated = true;
         [SerializeField] float ScrollSensitivity = 200;
         [SerializeField] Font ConsoleFont;
@@ -40,9 +41,7 @@ namespace CommandTerminal
         public static CommandHistory History { get; private set; }
 
         public static bool IssuedError {
-            get {
-                return Shell.IssuedErrorMessage != null;
-            }
+            get { return Shell.IssuedErrorMessage != null; }
         }
 
         public bool IsIdle {
@@ -76,7 +75,9 @@ namespace CommandTerminal
                 Debug.LogWarning("Command Console Warning: Please assign a font.");
             }
 
-            real_window_size = Screen.height * window_size;
+            Assert.AreNotEqual(HotKey.ToLower(), "return", "Return is not a valid HotKey");
+
+            real_window_size = Screen.height * WindowHeight;
             current_window_position = -real_window_size;
             StartCoroutine(SetupStyles());
             Shell.RegisterCommands();
@@ -87,7 +88,7 @@ namespace CommandTerminal
         }
 
         void OnGUI() {
-            if (Event.current.Equals(Event.KeyboardEvent("backquote"))) {
+            if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
                 open = true;
                 initial_open = true;
             }
@@ -97,7 +98,7 @@ namespace CommandTerminal
                 return;
             }
 
-            float position_delta = window_open_close_speed * Time.deltaTime;
+            float position_delta = ToggleSpeed * Time.deltaTime;
 
             if (open) {
                 if (current_window_position + position_delta < 0) {
@@ -193,8 +194,8 @@ namespace CommandTerminal
             GUI.SetNextControlName("command_text_field");
             command_text = GUILayout.TextField(command_text, input_style);
 
-            if (command_text == "`") {
-                command_text = ""; // Otherwise the TextField picks up the backquote character event
+            if (command_text == HotKey) {
+                command_text = ""; // Otherwise the TextField picks up the HotKey character event
             }
 
             if (initial_open) {
