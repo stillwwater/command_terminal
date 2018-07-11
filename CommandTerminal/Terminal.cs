@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections;
 using UnityEngine.Assertions;
 
-namespace Noods.Framework.RuntimeConsole
+namespace CommandTerminal
 {
     public class Terminal : MonoBehaviour
     {
