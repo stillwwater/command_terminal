@@ -71,18 +71,12 @@ namespace CommandTerminal
         }
     }
 
-    public class InterpreterMessage
-    {
-        public string message;
-        public LogType type;
-    }
-
     public class CommandInterpreter
     {
         Dictionary<string, CommandInfo> commands = new Dictionary<string, CommandInfo>();
         List<CommandArg> arguments = new List<CommandArg>(); // Cache for performance
 
-        public InterpreterMessage IssuedMessage { get; private set; }
+        public string IssuedErrorMessage { get; private set; }
 
         public Dictionary<string, CommandInfo> Commands {
             get { return commands; }
@@ -144,7 +138,7 @@ namespace CommandTerminal
         /// </summary>
         public void RunCommand(string line) {
             string remaining = line;
-            IssuedMessage = null;
+            IssuedErrorMessage = null;
             arguments.Clear();
 
             while (remaining != "") {
@@ -236,10 +230,7 @@ namespace CommandTerminal
         }
 
         public void IssueErrorMessage(string format, params object[] message) {
-            IssuedMessage = new InterpreterMessage() {
-                message = string.Format(format, message),
-                type = LogType.Error
-            };
+            IssuedErrorMessage = string.Format(format, message);
         }
 
         string InferCommandName(string method_name) {

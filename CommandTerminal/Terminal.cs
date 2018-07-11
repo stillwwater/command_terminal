@@ -41,8 +41,7 @@ namespace CommandTerminal
 
         public static bool IssuedError {
             get {
-                return Interpreter.IssuedMessage != null
-                    && Interpreter.IssuedMessage.type == LogType.Error;
+                return Interpreter.IssuedErrorMessage != null;
             }
         }
 
@@ -56,13 +55,6 @@ namespace CommandTerminal
 
         public static void Log(LogType type, string format, params object[] message) {
             Logger.HandleLog(string.Format(format, message), type);
-        }
-
-        public static void Log(InterpreterMessage info) {
-            var sb = new StringBuilder();
-            sb.Append("Error: ");
-            sb.Append(info.message);
-            Logger.HandleLog(sb.ToString(), info.type);
         }
 
         void OnEnable() {
@@ -90,7 +82,7 @@ namespace CommandTerminal
             Interpreter.RegisterCommands();
 
             if (IssuedError) {
-                Log(Interpreter.IssuedMessage);
+                Log(LogType.Error, "Error: {0}", Interpreter.IssuedErrorMessage);
             }
         }
 
@@ -227,7 +219,7 @@ namespace CommandTerminal
             History.Push(command_text);
 
             if (IssuedError) {
-                Log(Interpreter.IssuedMessage);
+                Log(LogType.Error, "Error: {0}", Interpreter.IssuedErrorMessage);
             }
 
             command_text = "";
