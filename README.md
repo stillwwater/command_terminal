@@ -9,9 +9,9 @@ Command Terminal is based on [an implementation by Jonathan Blow](https://youtu.
 
 ## Usage
 
-Copy the contents from [CommandTerminal](./CommandTerminal) to your Assets folder. Attach a `Terminal` Component to a game object. The console window can be opened with the backtick key.
+Copy the contents from [CommandTerminal](./CommandTerminal) to your Assets folder. Attach a `Terminal` Component to a game object. The console window can be toggled with a hotkey (default is backtick).
 
-Enter `HELP` in the console to view all available commands, use the up and down arrow keys to traverse the command history.
+Enter `help` in the console to view all available commands, use the up and down arrow keys to traverse the command history.
 
 ## Registering Commands
 

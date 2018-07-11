@@ -88,7 +88,7 @@ namespace Noods.Framework.RuntimeConsole
         }
 
         void OnGUI() {
-            if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
+            if (!open && Event.current.Equals(Event.KeyboardEvent(HotKey))) {
                 open = true;
                 initial_open = true;
             }
@@ -186,6 +186,8 @@ namespace Noods.Framework.RuntimeConsole
                 command_text = History.Previous();
             } else if (Event.current.Equals(Event.KeyboardEvent("down"))) {
                 command_text = History.Next();
+            } else if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
+                open = !open;
             }
 
             GUILayout.BeginHorizontal();
