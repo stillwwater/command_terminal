@@ -5,6 +5,8 @@ A simple and  highly performant in-game Console for calling C# methods, and disp
 
 ![gif](./demo.gif)
 
+Command Terminal is based on [an implementation by Jonathan Blow](https://youtu.be/N2UdveBwWY4) done in the Jai programming language.
+
 ## Usage
 
 Copy the contents from [CommandTerminal](./CommandTerminal) to your Assets folder. Attach a `Terminal` Component to a game object. The console window can be opened with the backtick key.
@@ -67,20 +69,5 @@ static void FrontCommandAdd(CommandArg[] args) {
 `RegisterCommand` only works for static methods. If you want to use a non-static method, you may add the command manually.
 
 ```csharp
-int health;
-
-// Unity method
-void Start() {
-    Terminal.Interpreter.AddCommand("player.health", CommandSetHealth, 1, 1, "Sets player health");
-}
-
-void CommandSetHealth(CommandArg[] args) {
-    int health = args[0].Int;
-
-    if (Terminal.IssuedError) {
-        return;
-    }
-
-    this.health = health;
-}
+Terminal.Interpreter.AddCommand("add", CommandAdd, 2, 2, "Adds 2 numbers");
 ```
