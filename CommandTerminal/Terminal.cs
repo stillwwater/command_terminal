@@ -36,12 +36,12 @@ namespace CommandTerminal
         GUIStyle input_style;
 
         public static ConsoleLogger Logger { get; private set; }
-        public static CommandInterpreter Interpreter { get; private set; }
+        public static CommandShell Shell { get; private set; }
         public static CommandHistory History { get; private set; }
 
         public static bool IssuedError {
             get {
-                return Interpreter.IssuedErrorMessage != null;
+                return Shell.IssuedErrorMessage != null;
             }
         }
 
@@ -59,7 +59,7 @@ namespace CommandTerminal
 
         void OnEnable() {
             Logger = new ConsoleLogger(MaxLogCount);
-            Interpreter = new CommandInterpreter();
+            Shell = new CommandShell();
             History = new CommandHistory();
 
             // Hook Unity log events
@@ -79,10 +79,10 @@ namespace CommandTerminal
             real_window_size = Screen.height * window_size;
             current_window_position = -real_window_size;
             StartCoroutine(SetupStyles());
-            Interpreter.RegisterCommands();
+            Shell.RegisterCommands();
 
             if (IssuedError) {
-                Log(LogType.Error, "Error: {0}", Interpreter.IssuedErrorMessage);
+                Log(LogType.Error, "Error: {0}", Shell.IssuedErrorMessage);
             }
         }
 
@@ -215,11 +215,11 @@ namespace CommandTerminal
 
         void EnterCommand() {
             Log("~ {0}", command_text);
-            Interpreter.RunCommand(command_text);
+            Shell.RunCommand(command_text);
             History.Push(command_text);
 
             if (IssuedError) {
-                Log(LogType.Error, "Error: {0}", Interpreter.IssuedErrorMessage);
+                Log(LogType.Error, "Error: {0}", Shell.IssuedErrorMessage);
             }
 
             command_text = "";

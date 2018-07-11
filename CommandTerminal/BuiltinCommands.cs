@@ -16,7 +16,7 @@ namespace CommandTerminal
 
         [RegisterCommand(Help = "Displays all Console Commands", MaxArgCount = 0)]
         static void CommandLs(CommandArg[] args) {
-            foreach (var command in Terminal.Interpreter.Commands) {
+            foreach (var command in Terminal.Shell.Commands) {
                 Terminal.Log("{0}: {1}", command.Key.PadRight(16), command.Value.help);
             }
         }
@@ -30,12 +30,12 @@ namespace CommandTerminal
 
             string command_name = args[0].String.ToUpper();
 
-            if (!Terminal.Interpreter.Commands.ContainsKey(command_name)) {
-                Terminal.Interpreter.IssueErrorMessage("Command {0} could not be found.", command_name);
+            if (!Terminal.Shell.Commands.ContainsKey(command_name)) {
+                Terminal.Shell.IssueErrorMessage("Command {0} could not be found.", command_name);
                 return;
             }
 
-            string help = Terminal.Interpreter.Commands[command_name].help;
+            string help = Terminal.Shell.Commands[command_name].help;
 
             if (help == null) {
                 Terminal.Log("{0} does not provide any help documentation.", command_name);
@@ -49,7 +49,7 @@ namespace CommandTerminal
             var sw = new Stopwatch();
             sw.Start();
 
-            Terminal.Interpreter.RunCommand(JoinArguments(args));
+            Terminal.Shell.RunCommand(JoinArguments(args));
 
             sw.Stop();
             Terminal.Log("Time: {0}ms", (double)sw.ElapsedTicks / 10000);
