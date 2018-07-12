@@ -39,7 +39,7 @@ namespace Noods.Framework.RuntimeConsole
         GUIStyle label_style;
         GUIStyle input_style;
 
-        public static ConsoleLogger Logger { get; private set; }
+        public static CommandLog Logger { get; private set; }
         public static CommandShell Shell { get; private set; }
         public static CommandHistory History { get; private set; }
 
@@ -62,7 +62,7 @@ namespace Noods.Framework.RuntimeConsole
         }
 
         void OnEnable() {
-            Logger = new ConsoleLogger(MaxLogCount);
+            Logger = new CommandLog(MaxLogCount);
             Shell = new CommandShell();
             History = new CommandHistory();
 
