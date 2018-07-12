@@ -22,6 +22,8 @@ namespace CommandTerminal
         [SerializeField] int MaxLogCount = 512;
         [SerializeField] Color BackgroundColor = Color.black;
         [SerializeField] Color ForegroundColor = Color.white;
+        [SerializeField] Color ShellMessageColor = Color.white;
+        [SerializeField] Color InputColor = Color.cyan;
         [SerializeField] Color WarningColor = Color.yellow;
         [SerializeField] Color ErrorColor = Color.red;
 
@@ -41,7 +43,9 @@ namespace CommandTerminal
         public static CommandHistory History { get; private set; }
 
         public static bool IssuedError {
-            get { return Shell.IssuedErrorMessage != null; }
+            get {
+                return Shell.IssuedErrorMessage != null;
+            }
         }
 
         public bool IsIdle {
@@ -49,10 +53,10 @@ namespace CommandTerminal
         }
 
         public static void Log(string format, params object[] message) {
-            Log(LogType.Log, format, message);
+            Log(TerminalLogType.ShellMessage, format, message);
         }
 
-        public static void Log(LogType type, string format, params object[] message) {
+        public static void Log(TerminalLogType type, string format, params object[] message) {
             Logger.HandleLog(string.Format(format, message), type);
         }
 
@@ -83,7 +87,7 @@ namespace CommandTerminal
             Shell.RegisterCommands();
 
             if (IssuedError) {
-                Log(LogType.Error, "Error: {0}", Shell.IssuedErrorMessage);
+                Log(TerminalLogType.Error, "Error: {0}", Shell.IssuedErrorMessage);
             }
         }
 
@@ -147,7 +151,7 @@ namespace CommandTerminal
             input_style.padding = new RectOffset(4, 4, 4, 4);
             input_style.font = ConsoleFont;
             input_style.fixedHeight = ConsoleFont.fontSize * 1.4f;
-            input_style.normal.textColor = ForegroundColor;
+            input_style.normal.textColor = InputColor;
 
             var dark_background = new Color();
             dark_background.r = BackgroundColor.r - 0.2f;
@@ -217,12 +221,12 @@ namespace CommandTerminal
         }
 
         void EnterCommand() {
-            Log("~ {0}", command_text);
+            Log(TerminalLogType.Input, "{0}", command_text);
             Shell.RunCommand(command_text);
             History.Push(command_text);
 
             if (IssuedError) {
-                Log(LogType.Error, "Error: {0}", Shell.IssuedErrorMessage);
+                Log(TerminalLogType.Error, "Error: {0}", Shell.IssuedErrorMessage);
             }
 
             command_text = "";
@@ -230,14 +234,16 @@ namespace CommandTerminal
         }
 
         void HandleUnityLog(string message, string stack_trace, LogType type) {
-            Logger.HandleLog(message, stack_trace, type);
+            Logger.HandleLog(message, stack_trace, (TerminalLogType)type);
             scroll_position.y = int.MaxValue;
         }
 
-        Color GetLogColor(LogType type) {
+        Color GetLogColor(TerminalLogType type) {
             switch (type) {
-                case LogType.Log: return ForegroundColor;
-                case LogType.Warning: return WarningColor;
+                case TerminalLogType.Message: return ForegroundColor;
+                case TerminalLogType.Warning: return WarningColor;
+                case TerminalLogType.Input: return InputColor;
+                case TerminalLogType.ShellMessage: return ShellMessageColor;
                 default: return ErrorColor;
             }
         }

@@ -3,9 +3,20 @@ using UnityEngine;
 
 namespace CommandTerminal
 {
+    public enum TerminalLogType
+    {
+        Error     = LogType.Error,
+        Assert    = LogType.Assert,
+        Warning   = LogType.Warning,
+        Message   = LogType.Log,
+        Exception = LogType.Exception,
+        Input,
+        ShellMessage
+    }
+
     public struct LogItem
     {
-        public LogType type;
+        public TerminalLogType type;
         public string message;
         public string stack_trace;
     }
@@ -23,11 +34,11 @@ namespace CommandTerminal
             this.max_items = max_items;
         }
 
-        public void HandleLog(string message, LogType type) {
+        public void HandleLog(string message, TerminalLogType type) {
             HandleLog(message, "", type);
         }
 
-        public void HandleLog(string message, string stack_trace, LogType type) {
+        public void HandleLog(string message, string stack_trace, TerminalLogType type) {
             LogItem log = new LogItem() {
                 message = message,
                 stack_trace = stack_trace,
