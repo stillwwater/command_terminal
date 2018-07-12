@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections;
 using UnityEngine.Assertions;
 
-namespace CommandTerminal
+namespace Noods.Framework.RuntimeConsole
 {
     public class Terminal : MonoBehaviour
     {
@@ -15,17 +15,18 @@ namespace CommandTerminal
         [SerializeField]
         float ToggleSpeed = 500;
 
-        [SerializeField] string HotKey = "`";
-        [SerializeField] bool Animated = true;
-        [SerializeField] float ScrollSensitivity = 200;
+        [SerializeField] string HotKey            = "`";
+        [SerializeField] string InputCaret        = ">";
+        [SerializeField] bool Animated            = true;
+        [SerializeField] float ScrollSensitivity  = 200;
         [SerializeField] Font ConsoleFont;
-        [SerializeField] int MaxLogCount = 512;
-        [SerializeField] Color BackgroundColor = Color.black;
-        [SerializeField] Color ForegroundColor = Color.white;
-        [SerializeField] Color ShellMessageColor = Color.white;
-        [SerializeField] Color InputColor = Color.cyan;
-        [SerializeField] Color WarningColor = Color.yellow;
-        [SerializeField] Color ErrorColor = Color.red;
+        [SerializeField] int MaxLogCount          = 512;
+        [SerializeField] Color BackgroundColor    = Color.black;
+        [SerializeField] Color ForegroundColor    = Color.white;
+        [SerializeField] Color ShellMessageColor  = Color.white;
+        [SerializeField] Color InputColor         = Color.cyan;
+        [SerializeField] Color WarningColor       = Color.yellow;
+        [SerializeField] Color ErrorColor         = Color.red;
 
         bool open;
         bool initial_open; // Used to focus on TextField when console opens
@@ -150,7 +151,7 @@ namespace CommandTerminal
             input_style = new GUIStyle();
             input_style.padding = new RectOffset(4, 4, 4, 4);
             input_style.font = ConsoleFont;
-            input_style.fixedHeight = ConsoleFont.fontSize * 1.4f;
+            input_style.fixedHeight = ConsoleFont.fontSize * 1.6f;
             input_style.normal.textColor = InputColor;
 
             var dark_background = new Color();
@@ -195,7 +196,10 @@ namespace CommandTerminal
             }
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(">", input_style, GUILayout.Width(ConsoleFont.fontSize));
+
+            if (InputCaret != "") {
+                GUILayout.Label(InputCaret, input_style, GUILayout.Width(ConsoleFont.fontSize));
+            }
 
             GUI.SetNextControlName("command_text_field");
             command_text = GUILayout.TextField(command_text, input_style);
