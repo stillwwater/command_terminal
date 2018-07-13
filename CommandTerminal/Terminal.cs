@@ -49,7 +49,7 @@ namespace CommandTerminal
         GUIStyle label_style;
         GUIStyle input_style;
 
-        public static ConsoleLog Logger { get; private set; }
+        public static CommandLog Logger { get; private set; }
         public static CommandShell Shell { get; private set; }
         public static CommandHistory History { get; private set; }
 
@@ -102,7 +102,7 @@ namespace CommandTerminal
         }
 
         void OnEnable() {
-            Logger = new ConsoleLog(MaxLogCount);
+            Logger = new CommandLog(MaxLogCount);
             Shell = new CommandShell();
             History = new CommandHistory();
 
