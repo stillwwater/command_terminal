@@ -23,7 +23,7 @@ namespace CommandTerminal
         float ToggleSpeed = 360;
 
         [SerializeField] string HotKey            = "`";
-        [SerializeField] string OpenBigHotKey     = "#`";
+        [SerializeField] string OpenFullHotKey    = "#`";
         [SerializeField] string InputCaret        = ">";
         [SerializeField] float ScrollSensitivity  = 200;
         [SerializeField] Font ConsoleFont;
@@ -36,12 +36,14 @@ namespace CommandTerminal
         [SerializeField] Color ErrorColor         = Color.red;
 
         TerminalState state;
+        bool input_fix;
         bool initial_open; // Used to focus on TextField when console opens
         Rect window;
         float current_open_t;
         float open_target;
         float real_window_size;
         string command_text;
+        string cached_command_text;
         Vector2 scroll_position;
         GUIStyle window_style;
         GUIStyle label_style;
@@ -68,6 +70,10 @@ namespace CommandTerminal
         }
 
         public void SetState(TerminalState new_state) {
+            input_fix = true;
+            cached_command_text = command_text;
+            command_text = "";
+
             switch (new_state) {
                 case TerminalState.Close:
                     open_target = 0;
@@ -91,6 +97,7 @@ namespace CommandTerminal
                     open_target = real_window_size;
                     break;
             }
+
             state = new_state;
         }
 
@@ -113,6 +120,8 @@ namespace CommandTerminal
                 Debug.LogWarning("Command Console Warning: Please assign a font.");
             }
 
+            command_text = "";
+            cached_command_text = command_text;
             Assert.AreNotEqual(HotKey.ToLower(), "return", "Return is not a valid HotKey");
 
             SetupWindow();
@@ -130,7 +139,7 @@ namespace CommandTerminal
             if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
                 SetState(TerminalState.OpenSmall);
                 initial_open = true;
-            } else if (Event.current.Equals(Event.KeyboardEvent(OpenBigHotKey))) {
+            } else if (Event.current.Equals(Event.KeyboardEvent(OpenFullHotKey))) {
                 SetState(TerminalState.OpenFull);
                 initial_open = true;
             }
@@ -205,7 +214,7 @@ namespace CommandTerminal
                 } else {
                     SetState(TerminalState.OpenSmall);
                 }
-            } else if (Event.current.Equals(Event.KeyboardEvent(OpenBigHotKey))) {
+            } else if (Event.current.Equals(Event.KeyboardEvent(OpenFullHotKey))) {
                 if (state == TerminalState.OpenFull) {
                     SetState(TerminalState.Close);
                 } else {
@@ -222,8 +231,9 @@ namespace CommandTerminal
             GUI.SetNextControlName("command_text_field");
             command_text = GUILayout.TextField(command_text, input_style);
 
-            if (command_text == HotKey) {
-                command_text = ""; // Otherwise the TextField picks up the HotKey character event
+            if (input_fix && command_text.Length > 0) {
+                command_text = cached_command_text; // Otherwise the TextField picks up the HotKey character event
+                input_fix = false;                  // Prevents checking string Length every draw call
             }
 
             if (initial_open) {
