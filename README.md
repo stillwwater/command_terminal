@@ -9,7 +9,7 @@ Command Terminal is based on [an implementation by Jonathan Blow](https://youtu.
 
 ## Usage
 
-Copy the contents from [CommandTerminal](./CommandTerminal) to your Assets folder. Attach a `Terminal` Component to a game object. The console window can be toggled with a hotkey (default is backtick).
+Copy the contents from [CommandTerminal](./CommandTerminal) to your Assets folder. Attach a `Terminal` Component to a game object. The console window can be toggled with a hotkey (default is backtick), and another hotkey can be used to toggle the full size window (default is shift+backtick).
 
 Enter `help` in the console to view all available commands, use the up and down arrow keys to traverse the command history.
 
@@ -69,5 +69,5 @@ static void FrontCommandAdd(CommandArg[] args) {
 `RegisterCommand` only works for static methods. If you want to use a non-static method, you may add the command manually.
 
 ```csharp
-Terminal.Interpreter.AddCommand("add", CommandAdd, 2, 2, "Adds 2 numbers");
+Terminal.Shell.AddCommand("add", CommandAdd, 2, 2, "Adds 2 numbers");
 ```

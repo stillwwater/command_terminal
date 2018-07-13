@@ -3,21 +3,28 @@ using System.Text;
 using System.Collections;
 using UnityEngine.Assertions;
 
-namespace Noods.Framework.RuntimeConsole
+namespace CommandTerminal
 {
+    public enum TerminalState
+    {
+        Close,
+        OpenSmall,
+        OpenFull
+    }
+
     public class Terminal : MonoBehaviour
     {
         [Range(0, 1)]
         [SerializeField]
-        float WindowHeight = 0.33f;
+        float MaxHeight = 0.7f;
 
         [Range(100, 1000)]
         [SerializeField]
-        float ToggleSpeed = 500;
+        float ToggleSpeed = 360;
 
         [SerializeField] string HotKey            = "`";
+        [SerializeField] string OpenBigHotKey     = "#`";
         [SerializeField] string InputCaret        = ">";
-        [SerializeField] bool Animated            = true;
         [SerializeField] float ScrollSensitivity  = 200;
         [SerializeField] Font ConsoleFont;
         [SerializeField] int MaxLogCount          = 512;
@@ -28,10 +35,11 @@ namespace Noods.Framework.RuntimeConsole
         [SerializeField] Color WarningColor       = Color.yellow;
         [SerializeField] Color ErrorColor         = Color.red;
 
-        bool open;
+        TerminalState state;
         bool initial_open; // Used to focus on TextField when console opens
         Rect window;
-        float current_window_position;
+        float current_open_t;
+        float open_target;
         float real_window_size;
         string command_text;
         Vector2 scroll_position;
@@ -39,18 +47,16 @@ namespace Noods.Framework.RuntimeConsole
         GUIStyle label_style;
         GUIStyle input_style;
 
-        public static CommandLog Logger { get; private set; }
+        public static ConsoleLog Logger { get; private set; }
         public static CommandShell Shell { get; private set; }
         public static CommandHistory History { get; private set; }
 
         public static bool IssuedError {
-            get {
-                return Shell.IssuedErrorMessage != null;
-            }
+            get { return Shell.IssuedErrorMessage != null; }
         }
 
-        public bool IsIdle {
-            get { return !open && current_window_position <= -real_window_size; }
+        public bool IsClosed {
+            get { return state == TerminalState.Close && Mathf.Approximately(current_open_t, open_target); }
         }
 
         public static void Log(string format, params object[] message) {
@@ -61,8 +67,35 @@ namespace Noods.Framework.RuntimeConsole
             Logger.HandleLog(string.Format(format, message), type);
         }
 
+        public void SetState(TerminalState new_state) {
+            switch (new_state) {
+                case TerminalState.Close:
+                    open_target = 0;
+                    break;
+                case TerminalState.OpenSmall:
+                    open_target = Screen.height * MaxHeight / 3;
+                    if (current_open_t <= open_target) {
+                        real_window_size = open_target;
+                    } else {
+                        // Prevent resizing from OpenFull to OpenSmall if window y position
+                        // is greater than OpenSmall's target
+                        open_target = 0;
+                        state = TerminalState.Close;
+                        return;
+                    }
+                    scroll_position.y = int.MaxValue;
+                    break;
+                case TerminalState.OpenFull:
+                default:
+                    real_window_size = Screen.height * MaxHeight;
+                    open_target = real_window_size;
+                    break;
+            }
+            state = new_state;
+        }
+
         void OnEnable() {
-            Logger = new CommandLog(MaxLogCount);
+            Logger = new ConsoleLog(MaxLogCount);
             Shell = new CommandShell();
             History = new CommandHistory();
 
@@ -82,9 +115,10 @@ namespace Noods.Framework.RuntimeConsole
 
             Assert.AreNotEqual(HotKey.ToLower(), "return", "Return is not a valid HotKey");
 
-            real_window_size = Screen.height * WindowHeight;
-            current_window_position = -real_window_size;
-            StartCoroutine(SetupStyles());
+            SetupWindow();
+            SetupInput();
+            SetupLabels();
+
             Shell.RegisterCommands();
 
             if (IssuedError) {
@@ -93,43 +127,26 @@ namespace Noods.Framework.RuntimeConsole
         }
 
         void OnGUI() {
-            if (!open && Event.current.Equals(Event.KeyboardEvent(HotKey))) {
-                open = true;
+            if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
+                SetState(TerminalState.OpenSmall);
+                initial_open = true;
+            } else if (Event.current.Equals(Event.KeyboardEvent(OpenBigHotKey))) {
+                SetState(TerminalState.OpenFull);
                 initial_open = true;
             }
 
-            if (IsIdle) {
-                // Don't render if console is off screen
-                return;
+            if (IsClosed) {
+              return;
             }
 
-            float position_delta = ToggleSpeed * Time.deltaTime;
-
-            if (open) {
-                if (current_window_position + position_delta < 0) {
-                    // Animate console opening
-                    DrawConsoleRect(position_delta, 0);
-                } else {
-                    // Clamp position
-                    DrawConsoleRect(0, 0, fixed_pos: true);
-                }
-            } else if (!open && current_window_position > -real_window_size) {
-                // Animate console closing
-                DrawConsoleRect(-position_delta, -real_window_size);
-            }
-
+            HandleOpenness();
             window = GUILayout.Window(88, window, DrawConsole, "", window_style);
         }
 
-        IEnumerator SetupStyles() {
-            SetupWindow();
-            yield return null;
-            SetupInput();
-            yield return null;
-            SetupLabels();
-        }
-
         void SetupWindow() {
+            real_window_size = Screen.height * MaxHeight / 3;
+            window = new Rect(0, current_open_t - real_window_size, Screen.width, real_window_size);
+
             // Set background color
             Texture2D background_texture = new Texture2D(1, 1);
             background_texture.SetPixel(0, 0, BackgroundColor);
@@ -166,25 +183,16 @@ namespace Noods.Framework.RuntimeConsole
             input_style.normal.background = input_background_texture;
         }
 
-        void DrawConsoleRect(float position_delta, float target_position, bool fixed_pos = false) {
-            if (Animated || fixed_pos) {
-                current_window_position += position_delta;
-            } else {
-                current_window_position = target_position;
-            }
-
-            window = new Rect(0, current_window_position, Screen.width, real_window_size);
-        }
-
         void DrawConsole(int Window2D) {
             GUILayout.BeginVertical();
 
             scroll_position = GUILayout.BeginScrollView(scroll_position, false, false, GUIStyle.none, GUIStyle.none);
+            GUILayout.FlexibleSpace();
             DrawLogs();
             GUILayout.EndScrollView();
 
             if (Event.current.Equals(Event.KeyboardEvent("escape"))) {
-                open = false;
+                SetState(TerminalState.Close);
             } else if (Event.current.Equals(Event.KeyboardEvent("return"))) {
                 EnterCommand();
             } else if (Event.current.Equals(Event.KeyboardEvent("up"))) {
@@ -192,7 +200,17 @@ namespace Noods.Framework.RuntimeConsole
             } else if (Event.current.Equals(Event.KeyboardEvent("down"))) {
                 command_text = History.Next();
             } else if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
-                open = !open;
+                if (state == TerminalState.OpenSmall) {
+                    SetState(TerminalState.Close);
+                } else {
+                    SetState(TerminalState.OpenSmall);
+                }
+            } else if (Event.current.Equals(Event.KeyboardEvent(OpenBigHotKey))) {
+                if (state == TerminalState.OpenFull) {
+                    SetState(TerminalState.Close);
+                } else {
+                    SetState(TerminalState.OpenFull);
+                }
             }
 
             GUILayout.BeginHorizontal();
@@ -222,6 +240,22 @@ namespace Noods.Framework.RuntimeConsole
                 label_style.normal.textColor = GetLogColor(log.type);
                 GUILayout.Label(log.message, label_style);
             }
+        }
+
+        void HandleOpenness() {
+            float dt = ToggleSpeed * Time.deltaTime;
+
+            if (current_open_t < open_target) {
+                current_open_t += dt;
+                if (current_open_t > open_target) current_open_t = open_target;
+            } else if (current_open_t > open_target) {
+                current_open_t -= dt;
+                if (current_open_t < open_target) current_open_t = open_target;
+            } else {
+                return; // Already at target
+            }
+
+            window = new Rect(0, current_open_t - real_window_size, Screen.width, real_window_size);
         }
 
         void EnterCommand() {
