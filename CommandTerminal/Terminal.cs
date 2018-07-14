@@ -25,11 +25,12 @@ namespace CommandTerminal
 
         [SerializeField] string ToggleHotkey      = "`";
         [SerializeField] string ToggleFullHotkey  = "#`";
-        [SerializeField] int BufferSize          = 512;
+        [SerializeField] int BufferSize           = 512;
 
         [Header("Input")]
         [SerializeField] Font ConsoleFont;
         [SerializeField] string InputCaret        = ">";
+        [SerializeField] bool ShowGUIButtons;
 
         [Header("Theme")]
         [SerializeField] Color BackgroundColor    = Color.black;
@@ -107,6 +108,14 @@ namespace CommandTerminal
             state = new_state;
         }
 
+        public void ToggleState(TerminalState new_state) {
+            if (state == new_state) {
+                SetState(TerminalState.Close);
+            } else {
+                SetState(new_state);
+            }
+        }
+
         void OnEnable() {
             Buffer = new CommandLog(BufferSize);
             Shell = new CommandShell();
@@ -155,6 +164,10 @@ namespace CommandTerminal
                 initial_open = true;
             }
 
+            if (ShowGUIButtons) {
+                DrawGUIButtons();
+            }
+
             if (IsClosed) {
                 return;
             }
@@ -175,6 +188,8 @@ namespace CommandTerminal
             window_style = new GUIStyle();
             window_style.normal.background = background_texture;
             window_style.padding = new RectOffset(4, 4, 4, 4);
+            window_style.normal.textColor = ForegroundColor;
+            window_style.font = ConsoleFont;
         }
 
         void SetupLabels() {
@@ -226,17 +241,9 @@ namespace CommandTerminal
             } else if (Event.current.Equals(Event.KeyboardEvent("down"))) {
                 command_text = History.Next();
             } else if (Event.current.Equals(Event.KeyboardEvent(ToggleHotkey))) {
-                if (state == TerminalState.OpenSmall) {
-                    SetState(TerminalState.Close);
-                } else {
-                    SetState(TerminalState.OpenSmall);
-                }
+                ToggleState(TerminalState.OpenSmall);
             } else if (Event.current.Equals(Event.KeyboardEvent(ToggleFullHotkey))) {
-                if (state == TerminalState.OpenFull) {
-                    SetState(TerminalState.Close);
-                } else {
-                    SetState(TerminalState.OpenFull);
-                }
+                ToggleState(TerminalState.OpenFull);
             } else if (Event.current.Equals(Event.KeyboardEvent("tab"))) {
                 CompleteCommand();
                 move_cursor = true; // Wait till next draw call
@@ -270,6 +277,23 @@ namespace CommandTerminal
                 label_style.normal.textColor = GetLogColor(log.type);
                 GUILayout.Label(log.message, label_style);
             }
+        }
+
+        void DrawGUIButtons() {
+            int size = ConsoleFont.fontSize;
+            // 7 is the number of chars in the button plus some padding, 2 is the line height.
+            // The layout will resize according to the font size.
+            GUILayout.BeginArea(new Rect(Screen.width - 7 * size, current_open_t, 7 * size, size * 2));
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Small", window_style)) {
+                ToggleState(TerminalState.OpenSmall);
+            } else if (GUILayout.Button("Full", window_style)) {
+                ToggleState(TerminalState.OpenFull);
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
         }
 
         void HandleOpenness() {
