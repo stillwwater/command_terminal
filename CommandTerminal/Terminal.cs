@@ -25,6 +25,7 @@ namespace CommandTerminal
         [SerializeField] string HotKey            = "`";
         [SerializeField] string OpenFullHotKey    = "#`";
         [SerializeField] string InputCaret        = ">";
+        [SerializeField] bool Animated            = true;
         [SerializeField] float ScrollSensitivity  = 200;
         [SerializeField] Font ConsoleFont;
         [SerializeField] int MaxLogCount          = 512;
@@ -36,7 +37,9 @@ namespace CommandTerminal
         [SerializeField] Color ErrorColor         = Color.red;
 
         TerminalState state;
+        TextEditor editor_state;
         bool input_fix;
+        bool move_cursor;
         bool initial_open; // Used to focus on TextField when console opens
         Rect window;
         float current_open_t;
@@ -52,6 +55,7 @@ namespace CommandTerminal
         public static CommandLog Logger { get; private set; }
         public static CommandShell Shell { get; private set; }
         public static CommandHistory History { get; private set; }
+        public static CommandAutocomplete Autocomplete { get; private set; }
 
         public static bool IssuedError {
             get { return Shell.IssuedErrorMessage != null; }
@@ -105,6 +109,7 @@ namespace CommandTerminal
             Logger = new CommandLog(MaxLogCount);
             Shell = new CommandShell();
             History = new CommandHistory();
+            Autocomplete = new CommandAutocomplete();
 
             // Hook Unity log events
             Application.logMessageReceived += HandleUnityLog;
@@ -133,6 +138,10 @@ namespace CommandTerminal
             if (IssuedError) {
                 Log(TerminalLogType.Error, "Error: {0}", Shell.IssuedErrorMessage);
             }
+
+            foreach (var command in Shell.Commands) {
+                Autocomplete.Register(command.Key);
+            }
         }
 
         void OnGUI() {
@@ -145,7 +154,7 @@ namespace CommandTerminal
             }
 
             if (IsClosed) {
-              return;
+                return;
             }
 
             HandleOpenness();
@@ -200,12 +209,18 @@ namespace CommandTerminal
             DrawLogs();
             GUILayout.EndScrollView();
 
+            if (move_cursor) {
+                CursorToEnd();
+                move_cursor = false;
+            }
+
             if (Event.current.Equals(Event.KeyboardEvent("escape"))) {
                 SetState(TerminalState.Close);
             } else if (Event.current.Equals(Event.KeyboardEvent("return"))) {
                 EnterCommand();
             } else if (Event.current.Equals(Event.KeyboardEvent("up"))) {
                 command_text = History.Previous();
+                move_cursor = true;
             } else if (Event.current.Equals(Event.KeyboardEvent("down"))) {
                 command_text = History.Next();
             } else if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
@@ -220,6 +235,9 @@ namespace CommandTerminal
                 } else {
                     SetState(TerminalState.OpenFull);
                 }
+            } else if (Event.current.Equals(Event.KeyboardEvent("tab"))) {
+                CompleteCommand();
+                move_cursor = true; // Wait till next draw call
             }
 
             GUILayout.BeginHorizontal();
@@ -279,6 +297,26 @@ namespace CommandTerminal
 
             command_text = "";
             scroll_position.y = int.MaxValue;
+        }
+
+        void CompleteCommand() {
+            string[] completion_buffer = Autocomplete.Complete(command_text);
+            int completion_length = completion_buffer.Length;
+
+            if (completion_length == 1) {
+                command_text = completion_buffer[0];
+            } else if (completion_length > 1) {
+                Log(TerminalLogType.Input, string.Join(" ", completion_buffer));
+                scroll_position.y = int.MaxValue;
+            }
+        }
+
+        void CursorToEnd() {
+            if (editor_state == null) {
+                editor_state = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+            }
+
+            editor_state.MoveCursorToPosition(new Vector2(999, 999));
         }
 
         void HandleUnityLog(string message, string stack_trace, LogType type) {
