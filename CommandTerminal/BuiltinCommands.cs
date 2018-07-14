@@ -11,7 +11,7 @@ namespace CommandTerminal
 
         [RegisterCommand(Help = "Clears the Command Console", MaxArgCount = 0)]
         static void CommandClear(CommandArg[] args) {
-            Terminal.Logger.Clear();
+            Terminal.Buffer.Clear();
         }
 
         [RegisterCommand(Help = "Lists all Commands or displays help documentation of a Command", MaxArgCount = 1)]
@@ -58,14 +58,14 @@ namespace CommandTerminal
     #if DEBUG
         [RegisterCommand(Help = "Outputs the StackTrace of the previous message", MaxArgCount = 0)]
         static void CommandTrace(CommandArg[] args) {
-            int log_count = Terminal.Logger.Logs.Count;
+            int log_count = Terminal.Buffer.Logs.Count;
 
             if (log_count - 2 <  0) {
                 Terminal.Log("Nothing to trace.");
                 return;
             }
 
-            var log_item = Terminal.Logger.Logs[log_count - 2];
+            var log_item = Terminal.Buffer.Logs[log_count - 2];
 
             if (log_item.stack_trace == "") {
                 Terminal.Log("{0} (no trace)", log_item.message);

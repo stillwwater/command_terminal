@@ -25,8 +25,7 @@ namespace CommandTerminal
 
         [SerializeField] string ToggleHotkey      = "`";
         [SerializeField] string ToggleFullHotkey  = "#`";
-        [SerializeField] float ScrollSensitivity  = 200;
-        [SerializeField] int MaxLogCount          = 512;
+        [SerializeField] int BufferSize          = 512;
 
         [Header("Input")]
         [SerializeField] Font ConsoleFont;
@@ -56,7 +55,7 @@ namespace CommandTerminal
         GUIStyle label_style;
         GUIStyle input_style;
 
-        public static CommandLog Logger { get; private set; }
+        public static CommandLog Buffer { get; private set; }
         public static CommandShell Shell { get; private set; }
         public static CommandHistory History { get; private set; }
         public static CommandAutocomplete Autocomplete { get; private set; }
@@ -74,7 +73,7 @@ namespace CommandTerminal
         }
 
         public static void Log(TerminalLogType type, string format, params object[] message) {
-            Logger.HandleLog(string.Format(format, message), type);
+            Buffer.HandleLog(string.Format(format, message), type);
         }
 
         public void SetState(TerminalState new_state) {
@@ -109,7 +108,7 @@ namespace CommandTerminal
         }
 
         void OnEnable() {
-            Logger = new CommandLog(MaxLogCount);
+            Buffer = new CommandLog(BufferSize);
             Shell = new CommandShell();
             History = new CommandHistory();
             Autocomplete = new CommandAutocomplete();
@@ -267,7 +266,7 @@ namespace CommandTerminal
         }
 
         void DrawLogs() {
-            foreach (var log in Logger.Logs) {
+            foreach (var log in Buffer.Logs) {
                 label_style.normal.textColor = GetLogColor(log.type);
                 GUILayout.Label(log.message, label_style);
             }
@@ -323,7 +322,7 @@ namespace CommandTerminal
         }
 
         void HandleUnityLog(string message, string stack_trace, LogType type) {
-            Logger.HandleLog(message, stack_trace, (TerminalLogType)type);
+            Buffer.HandleLog(message, stack_trace, (TerminalLogType)type);
             scroll_position.y = int.MaxValue;
         }
 
