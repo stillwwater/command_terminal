@@ -14,6 +14,7 @@ namespace CommandTerminal
 
     public class Terminal : MonoBehaviour
     {
+        [Header("Window")]
         [Range(0, 1)]
         [SerializeField]
         float MaxHeight = 0.7f;
@@ -22,16 +23,19 @@ namespace CommandTerminal
         [SerializeField]
         float ToggleSpeed = 360;
 
-        [SerializeField] string HotKey            = "`";
-        [SerializeField] string OpenFullHotKey    = "#`";
-        [SerializeField] string InputCaret        = ">";
-        [SerializeField] bool Animated            = true;
+        [SerializeField] string ToggleHotkey      = "`";
+        [SerializeField] string ToggleFullHotkey  = "#`";
         [SerializeField] float ScrollSensitivity  = 200;
-        [SerializeField] Font ConsoleFont;
         [SerializeField] int MaxLogCount          = 512;
+
+        [Header("Input")]
+        [SerializeField] Font ConsoleFont;
+        [SerializeField] string InputCaret        = ">";
+
+        [Header("Theme")]
         [SerializeField] Color BackgroundColor    = Color.black;
         [SerializeField] Color ForegroundColor    = Color.white;
-        [SerializeField] Color ShellMessageColor  = Color.white;
+        [SerializeField] Color ShellColor         = Color.white;
         [SerializeField] Color InputColor         = Color.cyan;
         [SerializeField] Color WarningColor       = Color.yellow;
         [SerializeField] Color ErrorColor         = Color.red;
@@ -84,15 +88,14 @@ namespace CommandTerminal
                     break;
                 case TerminalState.OpenSmall:
                     open_target = Screen.height * MaxHeight / 3;
-                    if (current_open_t <= open_target) {
-                        real_window_size = open_target;
-                    } else {
+                    if (current_open_t > open_target) {
                         // Prevent resizing from OpenFull to OpenSmall if window y position
                         // is greater than OpenSmall's target
                         open_target = 0;
                         state = TerminalState.Close;
                         return;
                     }
+                    real_window_size = open_target;
                     scroll_position.y = int.MaxValue;
                     break;
                 case TerminalState.OpenFull:
@@ -127,7 +130,7 @@ namespace CommandTerminal
 
             command_text = "";
             cached_command_text = command_text;
-            Assert.AreNotEqual(HotKey.ToLower(), "return", "Return is not a valid HotKey");
+            Assert.AreNotEqual(ToggleHotkey.ToLower(), "return", "Return is not a valid ToggleHotkey");
 
             SetupWindow();
             SetupInput();
@@ -145,10 +148,10 @@ namespace CommandTerminal
         }
 
         void OnGUI() {
-            if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
+            if (Event.current.Equals(Event.KeyboardEvent(ToggleHotkey))) {
                 SetState(TerminalState.OpenSmall);
                 initial_open = true;
-            } else if (Event.current.Equals(Event.KeyboardEvent(OpenFullHotKey))) {
+            } else if (Event.current.Equals(Event.KeyboardEvent(ToggleFullHotkey))) {
                 SetState(TerminalState.OpenFull);
                 initial_open = true;
             }
@@ -223,13 +226,13 @@ namespace CommandTerminal
                 move_cursor = true;
             } else if (Event.current.Equals(Event.KeyboardEvent("down"))) {
                 command_text = History.Next();
-            } else if (Event.current.Equals(Event.KeyboardEvent(HotKey))) {
+            } else if (Event.current.Equals(Event.KeyboardEvent(ToggleHotkey))) {
                 if (state == TerminalState.OpenSmall) {
                     SetState(TerminalState.Close);
                 } else {
                     SetState(TerminalState.OpenSmall);
                 }
-            } else if (Event.current.Equals(Event.KeyboardEvent(OpenFullHotKey))) {
+            } else if (Event.current.Equals(Event.KeyboardEvent(ToggleFullHotkey))) {
                 if (state == TerminalState.OpenFull) {
                     SetState(TerminalState.Close);
                 } else {
@@ -250,7 +253,7 @@ namespace CommandTerminal
             command_text = GUILayout.TextField(command_text, input_style);
 
             if (input_fix && command_text.Length > 0) {
-                command_text = cached_command_text; // Otherwise the TextField picks up the HotKey character event
+                command_text = cached_command_text; // Otherwise the TextField picks up the ToggleHotkey character event
                 input_fix = false;                  // Prevents checking string Length every draw call
             }
 
@@ -306,7 +309,7 @@ namespace CommandTerminal
             if (completion_length == 1) {
                 command_text = completion_buffer[0];
             } else if (completion_length > 1) {
-                Log(TerminalLogType.Input, string.Join(" ", completion_buffer));
+                Log(TerminalLogType.Input, string.Join("    ", completion_buffer));
                 scroll_position.y = int.MaxValue;
             }
         }
@@ -329,7 +332,7 @@ namespace CommandTerminal
                 case TerminalLogType.Message: return ForegroundColor;
                 case TerminalLogType.Warning: return WarningColor;
                 case TerminalLogType.Input: return InputColor;
-                case TerminalLogType.ShellMessage: return ShellMessageColor;
+                case TerminalLogType.ShellMessage: return ShellColor;
                 default: return ErrorColor;
             }
         }
