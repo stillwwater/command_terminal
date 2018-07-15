@@ -33,6 +33,9 @@ namespace CommandTerminal
         [SerializeField] bool ShowGUIButtons;
 
         [Header("Theme")]
+        [Range(0, 1)]
+        [SerializeField] float InputContrast;
+
         [SerializeField] Color BackgroundColor    = Color.black;
         [SerializeField] Color ForegroundColor    = Color.white;
         [SerializeField] Color ShellColor         = Color.white;
@@ -207,9 +210,9 @@ namespace CommandTerminal
             input_style.normal.textColor = InputColor;
 
             var dark_background = new Color();
-            dark_background.r = BackgroundColor.r - 0.2f;
-            dark_background.g = BackgroundColor.g - 0.2f;
-            dark_background.b = BackgroundColor.b - 0.2f;
+            dark_background.r = BackgroundColor.r - InputContrast;
+            dark_background.g = BackgroundColor.g - InputContrast;
+            dark_background.b = BackgroundColor.b - InputContrast;
             dark_background.a = 0.5f;
 
             Texture2D input_background_texture = new Texture2D(1, 1);
