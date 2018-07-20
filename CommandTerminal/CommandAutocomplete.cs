@@ -11,10 +11,10 @@ namespace CommandTerminal
             known_words.Add(word.ToLower());
         }
 
-        public string[] Complete(string partial_word) {
-            partial_word = partial_word.ToLower();
-            buffer.Clear();
+        public string[] Complete(ref string text) {
+            string partial_word = EatLastWord(ref text).ToLower();
             string known;
+            buffer.Clear();
 
             for (int i = 0; i < known_words.Count; i++) {
                 known = known_words[i];
@@ -25,6 +25,14 @@ namespace CommandTerminal
             }
 
             return buffer.ToArray();
+        }
+
+        string EatLastWord(ref string text) {
+            int last_space = text.LastIndexOf(' ');
+            string result = text.Substring(last_space + 1);
+
+            text = text.Substring(0, last_space + 1); // Remaining (keep space)
+            return result;
         }
     }
 }

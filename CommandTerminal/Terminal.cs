@@ -329,13 +329,15 @@ namespace CommandTerminal
         }
 
         void CompleteCommand() {
-            string[] completion_buffer = Autocomplete.Complete(command_text);
+            string head_text = command_text;
+            string[] completion_buffer = Autocomplete.Complete(ref head_text);
             int completion_length = completion_buffer.Length;
 
             if (completion_length == 1) {
-                command_text = completion_buffer[0];
+                command_text = head_text + completion_buffer[0];
             } else if (completion_length > 1) {
-                Log(TerminalLogType.Input, string.Join("    ", completion_buffer));
+                // Print possible completions
+                Log(string.Join("    ", completion_buffer));
                 scroll_position.y = int.MaxValue;
             }
         }
