@@ -31,6 +31,7 @@ namespace CommandTerminal
         [SerializeField] Font ConsoleFont;
         [SerializeField] string InputCaret        = ">";
         [SerializeField] bool ShowGUIButtons;
+        [SerializeField] bool RightAlignButtons;
 
         [Header("Theme")]
         [Range(0, 1)]
@@ -284,9 +285,11 @@ namespace CommandTerminal
 
         void DrawGUIButtons() {
             int size = ConsoleFont.fontSize;
+            float x_position = RightAlignButtons ? Screen.width - 7 * size : 0;
+
             // 7 is the number of chars in the button plus some padding, 2 is the line height.
             // The layout will resize according to the font size.
-            GUILayout.BeginArea(new Rect(Screen.width - 7 * size, current_open_t, 7 * size, size * 2));
+            GUILayout.BeginArea(new Rect(x_position, current_open_t, 7 * size, size * 2));
             GUILayout.BeginHorizontal();
 
             if (GUILayout.Button("Small", window_style)) {
