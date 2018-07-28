@@ -272,6 +272,10 @@ namespace CommandTerminal
                 initial_open = false;
             }
 
+            if (ShowGUIButtons && GUILayout.Button("| run", input_style, GUILayout.Width(Screen.width / 10))) {
+                EnterCommand();
+            }
+
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
         }
