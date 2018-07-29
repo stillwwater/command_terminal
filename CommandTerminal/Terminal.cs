@@ -19,6 +19,10 @@ namespace CommandTerminal
         [SerializeField]
         float MaxHeight = 0.7f;
 
+        [SerializeField]
+        [Range(0, 1)]
+        float SmallTerminalRatio = 0.33f;
+
         [Range(100, 1000)]
         [SerializeField]
         float ToggleSpeed = 360;
@@ -87,11 +91,12 @@ namespace CommandTerminal
             command_text = "";
 
             switch (new_state) {
-                case TerminalState.Close:
+                case TerminalState.Close: {
                     open_target = 0;
                     break;
-                case TerminalState.OpenSmall:
-                    open_target = Screen.height * MaxHeight / 3;
+                }
+                case TerminalState.OpenSmall: {
+                    open_target = Screen.height * MaxHeight * SmallTerminalRatio;
                     if (current_open_t > open_target) {
                         // Prevent resizing from OpenFull to OpenSmall if window y position
                         // is greater than OpenSmall's target
@@ -102,11 +107,13 @@ namespace CommandTerminal
                     real_window_size = open_target;
                     scroll_position.y = int.MaxValue;
                     break;
+                }
                 case TerminalState.OpenFull:
-                default:
+                default: {
                     real_window_size = Screen.height * MaxHeight;
                     open_target = real_window_size;
                     break;
+                }
             }
 
             state = new_state;
