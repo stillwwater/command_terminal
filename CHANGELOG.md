@@ -8,7 +8,7 @@ Changelog
 - Option to change the window size ratio between the partial and full window height.
 - Optional GUI button to run a command (useful for mobile devices).
 
-## Changed
+### Changed
 - Autocomplete now uses the last word in the input text, rather than just completing the first word.
 
 ## 1.0  `db07b43` - 2018-07-15
