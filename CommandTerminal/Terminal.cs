@@ -63,6 +63,7 @@ namespace CommandTerminal
         GUIStyle window_style;
         GUIStyle label_style;
         GUIStyle input_style;
+        Texture2D background_texture;
 
         public static CommandLog Buffer { get; private set; }
         public static CommandShell Shell { get; private set; }
@@ -192,7 +193,7 @@ namespace CommandTerminal
             window = new Rect(0, current_open_t - real_window_size, Screen.width, real_window_size);
 
             // Set background color
-            Texture2D background_texture = new Texture2D(1, 1);
+            background_texture = new Texture2D(1, 1);
             background_texture.SetPixel(0, 0, BackgroundColor);
             background_texture.Apply();
 

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## [Unreleased]
+
+### Fixed
+- Fix background texture being destroyed when loading a scene with the Terminal set to `DontDestroyOnLoad`.
+
 ## 1.01 `9a1b0b3` - 2018-08-09
 
 ### Added
