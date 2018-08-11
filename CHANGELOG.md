@@ -5,6 +5,7 @@ Changelog
 
 ### Fixed
 - Fix background texture being destroyed when loading a scene with the Terminal set to `DontDestroyOnLoad`.
+- Fix hotkeys bound to function keys causing the input to not register the first character.
 
 ## 1.01 `9a1b0b3` - 2018-08-09
 

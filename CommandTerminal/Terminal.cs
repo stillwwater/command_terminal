@@ -324,6 +324,9 @@ namespace CommandTerminal
                 current_open_t -= dt;
                 if (current_open_t < open_target) current_open_t = open_target;
             } else {
+                if (input_fix) {
+                    input_fix = false;
+                }
                 return; // Already at target
             }
 
