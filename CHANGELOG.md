@@ -3,6 +3,9 @@ Changelog
 
 ## [Unreleased]
 
+### Changed
+- Better autocompletion: autocomplete can now partially complete words when there are multiple suggestions available.
+
 ### Fixed
 - Fix background texture being destroyed when loading a scene with the Terminal set to `DontDestroyOnLoad`.
 - Fix hotkeys bound to function keys causing the input to not register the first character.

@@ -351,9 +351,11 @@ namespace CommandTerminal
             string[] completion_buffer = Autocomplete.Complete(ref head_text);
             int completion_length = completion_buffer.Length;
 
-            if (completion_length == 1) {
-                command_text = head_text + completion_buffer[0];
-            } else if (completion_length > 1) {
+            if (completion_length != 0) {
+                command_text = head_text;
+            }
+
+            if (completion_length > 1) {
                 // Print possible completions
                 Log(string.Join("    ", completion_buffer));
                 scroll_position.y = int.MaxValue;
