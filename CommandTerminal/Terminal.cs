@@ -40,6 +40,8 @@ namespace CommandTerminal
         [Header("Theme")]
         [Range(0, 1)]
         [SerializeField] float InputContrast;
+        [Range(0, 1)]
+        [SerializeField] float InputAlpha         = 0.5f;
 
         [SerializeField] Color BackgroundColor    = Color.black;
         [SerializeField] Color ForegroundColor    = Color.white;
@@ -64,6 +66,7 @@ namespace CommandTerminal
         GUIStyle label_style;
         GUIStyle input_style;
         Texture2D background_texture;
+        Texture2D input_background_texture;
 
         public static CommandLog Buffer { get; private set; }
         public static CommandShell Shell { get; private set; }
@@ -222,9 +225,9 @@ namespace CommandTerminal
             dark_background.r = BackgroundColor.r - InputContrast;
             dark_background.g = BackgroundColor.g - InputContrast;
             dark_background.b = BackgroundColor.b - InputContrast;
-            dark_background.a = 0.5f;
+            dark_background.a = InputAlpha;
 
-            Texture2D input_background_texture = new Texture2D(1, 1);
+            input_background_texture = new Texture2D(1, 1);
             input_background_texture.SetPixel(0, 0, dark_background);
             input_background_texture.Apply();
             input_style.normal.background = input_background_texture;

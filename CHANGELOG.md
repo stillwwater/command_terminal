@@ -3,6 +3,9 @@ Changelog
 
 ## [Unreleased]
 
+### Added
+- Option to change the alpha value of the input background texture.
+
 ### Changed
 - Better autocompletion: autocomplete can now partially complete words when there are multiple suggestions available.
 
