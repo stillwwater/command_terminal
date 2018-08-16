@@ -4,6 +4,7 @@ Changelog
 ## [Unreleased]
 
 ### Added
+- Variables: defined with `set name value`, accessed with `$name`. Run `set` with no arguments to display all variables and their values.
 - Option to change the alpha value of the input background texture.
 
 ### Changed

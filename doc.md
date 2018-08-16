@@ -5,9 +5,30 @@
 |              | Description                                                        |
 |:-------------|:-------------------------------------------------------------------|
 | Buffer       | Handles incoming logs                                              |
-| Autocomplete | Keeps a dictionary of known words and uses it to autocomplete text |
+| Autocomplete | Keeps a list of known words and uses it to autocomplete text       |
 | Shell        | Responsible for parsing and executing commands                     |
 | History      | Keeps a list of issued commands and can traverse through that list |
+
+### Variables:
+
+```csharp
+Terminal.Shell.SetVariable("level", SceneManager.GetActiveScene().name);
+```
+
+In the console:
+
+```
+> print $level
+Main
+
+> set greet Hello World!
+> print $greet
+Hello World!
+
+> set
+LEVEL  : Main
+GREET  : Hello World!
+```
 
 ### Add words to autocomplete:
 

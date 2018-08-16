@@ -74,12 +74,17 @@ namespace CommandTerminal
     public class CommandShell
     {
         Dictionary<string, CommandInfo> commands = new Dictionary<string, CommandInfo>();
+        Dictionary<string, CommandArg> variables = new Dictionary<string, CommandArg>();
         List<CommandArg> arguments = new List<CommandArg>(); // Cache for performance
 
         public string IssuedErrorMessage { get; private set; }
 
         public Dictionary<string, CommandInfo> Commands {
             get { return commands; }
+        }
+
+        public Dictionary<string, CommandArg> Variables {
+            get { return variables; }
         }
 
         /// <summary>
@@ -145,6 +150,14 @@ namespace CommandTerminal
                 var argument = EatArgument(ref remaining);
 
                 if (argument.String != "") {
+                    if (argument.String[0] == '$') {
+                        string variable_name = argument.String.Substring(1).ToUpper();
+
+                        if (variables.ContainsKey(variable_name)) {
+                            // Replace variable argument if it's defined
+                            argument = variables[variable_name];
+                        }
+                    }
                     arguments.Add(argument);
                 }
             }
@@ -214,19 +227,40 @@ namespace CommandTerminal
             commands.Add(name, info);
         }
 
-        public void AddCommand(string name,
-                               Action<CommandArg[]> proc,
-                               int min_arg_count = 0,
-                               int max_arg_count = -1,
-                               string help = "") {
+        public void AddCommand(string name, Action<CommandArg[]> proc, int min_args = 0, int max_args = -1, string help = "") {
             var info = new CommandInfo() {
                 proc = proc,
-                min_arg_count = min_arg_count,
-                max_arg_count = max_arg_count,
+                min_arg_count = min_args,
+                max_arg_count = max_args,
                 help = help
             };
 
             AddCommand(name, info);
+        }
+
+        public void SetVariable(string name, string value) {
+            SetVariable(name, new CommandArg() { String = value });
+        }
+
+        public void SetVariable(string name, CommandArg value) {
+            name = name.ToUpper();
+
+            if (variables.ContainsKey(name)) {
+                variables[name] = value;
+            } else {
+                variables.Add(name, value);
+            }
+        }
+
+        public CommandArg GetVariable(string name) {
+            name = name.ToUpper();
+
+            if (variables.ContainsKey(name)) {
+                return variables[name];
+            }
+
+            IssueErrorMessage("No variable named {0}", name);
+            return new CommandArg();
         }
 
         public void IssueErrorMessage(string format, params object[] message) {

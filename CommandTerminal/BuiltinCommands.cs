@@ -60,7 +60,7 @@ namespace CommandTerminal
         static void CommandTrace(CommandArg[] args) {
             int log_count = Terminal.Buffer.Logs.Count;
 
-            if (log_count - 2 <  0) {
+            if (log_count - 2 < 0) {
                 Terminal.Log("Nothing to trace.");
                 return;
             }
@@ -75,6 +75,24 @@ namespace CommandTerminal
         }
     #endif
 
+        [RegisterCommand(Help = "Lists all variables or sets a variable value")]
+        static void CommandSet(CommandArg[] args) {
+            if (args.Length == 0) {
+                foreach (var kv in Terminal.Shell.Variables) {
+                    Terminal.Log("{0}: {1}", kv.Key.PadRight(16), kv.Value);
+                }
+                return;
+            }
+
+            string variable_name = args[0].String;
+
+            if (variable_name[0] == '$') {
+                Terminal.Log(TerminalLogType.Warning, "Warning: Variable name starts with '$', '${0}'.", variable_name);
+            }
+
+            Terminal.Shell.SetVariable(variable_name, JoinArguments(args, 1));
+        }
+
         [RegisterCommand(Help = "Quits running Application", MaxArgCount = 0)]
         static void CommandQuit(CommandArg[] args) {
         #if UNITY_EDITOR
@@ -84,11 +102,11 @@ namespace CommandTerminal
         #endif
         }
 
-        static string JoinArguments(CommandArg[] args) {
+        static string JoinArguments(CommandArg[] args, int start = 0) {
             var sb = new StringBuilder();
             int arg_length = args.Length;
 
-            for (int i = 0; i < arg_length; i++) {
+            for (int i = start; i < arg_length; i++) {
                 sb.Append(args[i].String);
 
                 if (i < arg_length - 1) {
