@@ -6,15 +6,12 @@ namespace CommandTerminal
 {
     public static class BuiltinCommands
     {
-        [RegisterCommand(Help = "Does nothing")]
-        static void CommandNoop(CommandArg[] args) { }
-
-        [RegisterCommand(Help = "Clears the Command Console", MaxArgCount = 0)]
+        [RegisterCommand(Help = "Clear the command console", MaxArgCount = 0)]
         static void CommandClear(CommandArg[] args) {
             Terminal.Buffer.Clear();
         }
 
-        [RegisterCommand(Help = "Lists all Commands or displays help documentation of a Command", MaxArgCount = 1)]
+        [RegisterCommand(Help = "Display help information about a command", MaxArgCount = 1)]
         static void CommandHelp(CommandArg[] args) {
             if (args.Length == 0) {
                 foreach (var command in Terminal.Shell.Commands) {
@@ -39,7 +36,7 @@ namespace CommandTerminal
             }
         }
 
-        [RegisterCommand(Help = "Times the execution of a Command", MinArgCount = 1)]
+        [RegisterCommand(Help = "Time the execution of a command", MinArgCount = 1)]
         static void CommandTime(CommandArg[] args) {
             var sw = new Stopwatch();
             sw.Start();
@@ -50,13 +47,13 @@ namespace CommandTerminal
             Terminal.Log("Time: {0}ms", (double)sw.ElapsedTicks / 10000);
         }
 
-        [RegisterCommand(Help = "Outputs message")]
+        [RegisterCommand(Help = "Output message")]
         static void CommandPrint(CommandArg[] args) {
             Terminal.Log(JoinArguments(args));
         }
 
     #if DEBUG
-        [RegisterCommand(Help = "Outputs the StackTrace of the previous message", MaxArgCount = 0)]
+        [RegisterCommand(Help = "Output the stack trace of the previous message", MaxArgCount = 0)]
         static void CommandTrace(CommandArg[] args) {
             int log_count = Terminal.Buffer.Logs.Count;
 
@@ -75,7 +72,7 @@ namespace CommandTerminal
         }
     #endif
 
-        [RegisterCommand(Help = "Lists all variables or sets a variable value")]
+        [RegisterCommand(Help = "List all variables or set a variable value")]
         static void CommandSet(CommandArg[] args) {
             if (args.Length == 0) {
                 foreach (var kv in Terminal.Shell.Variables) {
@@ -93,7 +90,10 @@ namespace CommandTerminal
             Terminal.Shell.SetVariable(variable_name, JoinArguments(args, 1));
         }
 
-        [RegisterCommand(Help = "Quits running Application", MaxArgCount = 0)]
+        [RegisterCommand(Help = "No operation")]
+        static void CommandNoop(CommandArg[] args) { }
+
+        [RegisterCommand(Help = "Quit running application", MaxArgCount = 0)]
         static void CommandQuit(CommandArg[] args) {
         #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
