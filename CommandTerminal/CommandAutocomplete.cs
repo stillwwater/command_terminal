@@ -11,7 +11,7 @@ namespace CommandTerminal
             known_words.Add(word.ToLower());
         }
 
-        public string[] Complete(ref string text) {
+        public string[] Complete(ref string text, ref int format_width) {
             string partial_word = EatLastWord(ref text).ToLower();
             string known;
 
@@ -20,6 +20,10 @@ namespace CommandTerminal
 
                 if (known.StartsWith(partial_word)) {
                     buffer.Add(known);
+
+                    if (known.Length > format_width) {
+                        format_width = known.Length;
+                    }
                 }
             }
 

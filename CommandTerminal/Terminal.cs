@@ -351,7 +351,9 @@ namespace CommandTerminal
 
         void CompleteCommand() {
             string head_text = command_text;
-            string[] completion_buffer = Autocomplete.Complete(ref head_text);
+            int format_width = 0;
+
+            string[] completion_buffer = Autocomplete.Complete(ref head_text, ref format_width);
             int completion_length = completion_buffer.Length;
 
             if (completion_length != 0) {
@@ -360,7 +362,13 @@ namespace CommandTerminal
 
             if (completion_length > 1) {
                 // Print possible completions
-                Log(string.Join("    ", completion_buffer));
+                var log_buffer = new StringBuilder();
+
+                foreach (string completion in completion_buffer) {
+                    log_buffer.Append(completion.PadRight(format_width + 4));
+                }
+
+                Log("{0}", log_buffer);
                 scroll_position.y = int.MaxValue;
             }
         }
