@@ -12,6 +12,7 @@ namespace CommandTerminal
         public int max_arg_count;
         public int min_arg_count;
         public string help;
+        public string hint;
     }
 
     public struct CommandArg
@@ -132,7 +133,7 @@ namespace CommandTerminal
                     // This is essentially allows us to store a reference to the method,
                     // which makes calling the method significantly more performant than using MethodInfo.Invoke().
                     proc = (Action<CommandArg[]>)Delegate.CreateDelegate(typeof(Action<CommandArg[]>), method);
-                    AddCommand(command_name, proc, attribute.MinArgCount, attribute.MaxArgCount, attribute.Help);
+                    AddCommand(command_name, proc, attribute.MinArgCount, attribute.MaxArgCount, attribute.Help, attribute.Hint);
                 }
             }
             HandleRejectedCommands(rejected_commands);
@@ -203,6 +204,7 @@ namespace CommandTerminal
 
             if (error_message != null) {
                 string plural_fix = required_arg == 1 ? "" : "s";
+
                 IssueErrorMessage(
                     "{0} requires {1} {2} argument{3}",
                     command_name,
@@ -210,6 +212,11 @@ namespace CommandTerminal
                     required_arg,
                     plural_fix
                 );
+
+                if (command.hint != null) {
+                    IssuedErrorMessage += string.Format("\n    -> Usage: {0}", command.hint);
+                }
+
                 return;
             }
 
@@ -227,12 +234,13 @@ namespace CommandTerminal
             commands.Add(name, info);
         }
 
-        public void AddCommand(string name, Action<CommandArg[]> proc, int min_args = 0, int max_args = -1, string help = "") {
+        public void AddCommand(string name, Action<CommandArg[]> proc, int min_args = 0, int max_args = -1, string help = "", string hint = null) {
             var info = new CommandInfo() {
                 proc = proc,
                 min_arg_count = min_args,
                 max_arg_count = max_args,
-                help = help
+                help = help,
+                hint = hint
             };
 
             AddCommand(name, info);

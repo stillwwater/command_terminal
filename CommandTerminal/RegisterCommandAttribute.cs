@@ -21,6 +21,7 @@ namespace CommandTerminal
 
         public string Name { get; set; }
         public string Help { get; set; }
+        public string Hint { get; set; }
 
         public RegisterCommandAttribute(string command_name = null) {
             Name = command_name;

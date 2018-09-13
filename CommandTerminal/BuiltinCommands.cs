@@ -27,12 +27,14 @@ namespace CommandTerminal
                 return;
             }
 
-            string help = Terminal.Shell.Commands[command_name].help;
+            var info = Terminal.Shell.Commands[command_name];
 
-            if (help == null) {
+            if (info.help == null) {
                 Terminal.Log("{0} does not provide any help documentation.", command_name);
+            } else if (info.hint == null) {
+                Terminal.Log(info.help);
             } else {
-                Terminal.Log(help);
+                Terminal.Log("{0}\nUsage: {1}", info.help, info.hint);
             }
         }
 
