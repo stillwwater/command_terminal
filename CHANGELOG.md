@@ -1,11 +1,12 @@
 Changelog
 =========
 
-## [Unreleased]
+## 1.02 `08a66da` - 2018-09-14
 
 ### Added
 - Variables: defined with `set name value`, accessed with `$name`. Run `set` with no arguments to display all variables and their values.
 - Option to change the alpha value of the input background texture.
+- Command hint argument for better error messages. Use `RegisterCommand(Hint = "Command $a")]` to show a command's usage.
 
 ### Changed
 - Better autocompletion: autocomplete can now partially complete words when there are multiple suggestions available.
@@ -13,6 +14,7 @@ Changelog
 ### Fixed
 - Fix background texture being destroyed when loading a scene with the Terminal set to `DontDestroyOnLoad`.
 - Fix hotkeys bound to function keys causing the input to not register the first character.
+- Fix formatting on autocomplete suggestions.
 
 ## 1.01 `9a1b0b3` - 2018-08-09
 
