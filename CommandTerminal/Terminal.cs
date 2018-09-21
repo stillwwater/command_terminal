@@ -318,7 +318,7 @@ namespace CommandTerminal
         }
 
         void HandleOpenness() {
-            float dt = ToggleSpeed * Time.deltaTime;
+            float dt = ToggleSpeed * Time.unscaledDeltaTime;
 
             if (current_open_t < open_target) {
                 current_open_t += dt;
