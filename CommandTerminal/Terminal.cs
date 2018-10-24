@@ -407,13 +407,26 @@ namespace CommandTerminal
         }
 
 
-        private static Dictionary<KeyCode, string> BoundCommands = new Dictionary<KeyCode, string>();
-        public static void AddBinding(KeyCode key, string command) => BoundCommands.Add(key, command);
+        private static Dictionary<KeyCode, List<string>> BoundCommands = new Dictionary<KeyCode, List<string>>();
+        public static void AddBinding(KeyCode key, string command)
+        {
+            if (!BoundCommands.ContainsKey(key))
+                BoundCommands.Add(key, new List<string>());
+
+            BoundCommands[key].Add(command);
+        }
+
+        public static void ResetBinding(KeyCode key)
+        {
+            BoundCommands.Remove(key);
+        }
+
         private void Update()
         {
             foreach (var v in BoundCommands)
                 if (Input.GetKeyDown(v.Key))
-                    Shell.RunCommand(v.Value);
+                    foreach(var c in v.Value)
+                        Shell.RunCommand(c);
         }
 
         private static void RunStartupCommands()

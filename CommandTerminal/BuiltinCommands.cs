@@ -103,6 +103,12 @@ namespace CommandTerminal
             Terminal.AddBinding(args[0].AsEnum<KeyCode>(), fullCommand);
         }
 
+        [RegisterCommand(Help = "Remove all bindings from a key", MinArgCount = 1, MaxArgCount = 1)]
+        static void CommandUnbind(CommandArg[] args)
+        {
+            Terminal.ResetBinding(args[0].AsEnum<KeyCode>());
+        }
+
         [RegisterCommand(Help = "No operation")]
         static void CommandNoop(CommandArg[] args) { }
 
