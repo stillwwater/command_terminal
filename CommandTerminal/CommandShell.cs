@@ -60,6 +60,22 @@ namespace CommandTerminal
             }
         }
 
+        public T AsEnum<T>() where T : struct, IConvertible
+        {
+            if (!typeof(T).IsEnum)
+                throw new Exception($"type {typeof(T).FullName} is not an enum - you can't read the CommandArg this way");
+
+            if(Enum.TryParse(String, ignoreCase: true, out T value))
+            {
+                return value;
+            }
+            else
+            {
+                Terminal.Shell.IssueErrorMessage($"value {String} not found in enum type {typeof(T).FullName}");
+                return default;
+            }
+        }
+
         public override string ToString() {
             return String;
         }
