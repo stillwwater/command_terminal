@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Diagnostics;
 using UnityEngine;
@@ -90,6 +91,19 @@ namespace CommandTerminal
             }
 
             Terminal.Shell.SetVariable(variable_name, JoinArguments(args, 1));
+        }
+
+        [RegisterCommand(Help = "Bind a command to a key", MinArgCount = 2)]
+        static void CommandBind(CommandArg[] args)
+        {
+            string fullCommand = "";
+            for (int i = 1; i < args.Length; i++)
+                fullCommand += args[i].String;
+
+            if (Enum.TryParse(args[0].String, ignoreCase: true, out KeyCode key))
+                Terminal.AddBinding(key, args[1].String);
+            else
+                Terminal.Log(TerminalLogType.Warning, $"{args[0].String} is not a valid keycode. See https://docs.unity3d.com/ScriptReference/KeyCode.html for a list of valid keycodes.");
         }
 
         [RegisterCommand(Help = "No operation")]

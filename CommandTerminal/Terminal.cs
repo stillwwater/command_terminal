@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Text;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 namespace CommandTerminal
@@ -401,6 +401,16 @@ namespace CommandTerminal
                 case TerminalLogType.ShellMessage: return ShellColor;
                 default: return ErrorColor;
             }
+        }
+
+
+        private static Dictionary<KeyCode, string> BoundCommands = new Dictionary<KeyCode, string>();
+        public static void AddBinding(KeyCode key, string command) => BoundCommands.Add(key, command);
+        private void Update()
+        {
+            foreach (var v in BoundCommands)
+                if (Input.GetKeyDown(v.Key))
+                    Shell.RunCommand(v.Value);
         }
     }
 }
