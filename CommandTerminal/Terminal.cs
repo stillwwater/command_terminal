@@ -33,6 +33,7 @@ namespace CommandTerminal
 
         [Header("Input")]
         [SerializeField] Font ConsoleFont;
+        [SerializeField] int ConsoleFontSize;
         [SerializeField] string InputCaret        = ">";
         [SerializeField] bool ShowGUIButtons;
         [SerializeField] bool RightAlignButtons;
@@ -151,6 +152,9 @@ namespace CommandTerminal
                 Debug.LogWarning("Command Console Warning: Please assign a font.");
             }
 
+            if (ConsoleFontSize == 0)
+                ConsoleFontSize = ConsoleFont.fontSize;
+
             command_text = "";
             cached_command_text = command_text;
             Assert.AreNotEqual(ToggleHotkey.ToLower(), "return", "Return is not a valid ToggleHotkey");
@@ -205,11 +209,13 @@ namespace CommandTerminal
             window_style.padding = new RectOffset(4, 4, 4, 4);
             window_style.normal.textColor = ForegroundColor;
             window_style.font = ConsoleFont;
+            window_style.fontSize = ConsoleFontSize;
         }
 
         void SetupLabels() {
             label_style = new GUIStyle();
             label_style.font = ConsoleFont;
+            label_style.fontSize = ConsoleFontSize;
             label_style.normal.textColor = ForegroundColor;
             label_style.wordWrap = true;
         }
@@ -218,7 +224,8 @@ namespace CommandTerminal
             input_style = new GUIStyle();
             input_style.padding = new RectOffset(4, 4, 4, 4);
             input_style.font = ConsoleFont;
-            input_style.fixedHeight = ConsoleFont.fontSize * 1.6f;
+            input_style.fontSize = ConsoleFontSize;
+            input_style.fixedHeight = ConsoleFontSize * 1.6f;
             input_style.normal.textColor = InputColor;
 
             var dark_background = new Color();
