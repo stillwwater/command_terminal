@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Text;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine.Assertions;
 
 namespace CommandTerminal
@@ -172,6 +173,8 @@ namespace CommandTerminal
             foreach (var command in Shell.Commands) {
                 Autocomplete.Register(command.Key);
             }
+
+            RunStartupCommands();
         }
 
         void OnGUI() {
@@ -411,6 +414,23 @@ namespace CommandTerminal
             foreach (var v in BoundCommands)
                 if (Input.GetKeyDown(v.Key))
                     Shell.RunCommand(v.Value);
+        }
+
+        private static void RunStartupCommands()
+        {
+            const string fileName = "StartupCommands.txt";
+
+            // In editor, this refers to the directory which contains the assets folder.
+            // In stanalone, this refers to the directory which contains the executable.
+            string directory = Directory.GetParent(Application.dataPath).FullName;
+            string filepath = Path.Combine(directory, fileName);
+            Debug.Log(filepath);
+            if (File.Exists(filepath))
+            {
+                var commands = File.ReadAllLines(filepath);
+                for (int i = 0; i < commands.Length; i++)
+                    Shell.RunCommand(commands[i]);
+            }
         }
     }
 }
