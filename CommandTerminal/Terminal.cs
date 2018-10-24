@@ -424,7 +424,6 @@ namespace CommandTerminal
             // In stanalone, this refers to the directory which contains the executable.
             string directory = Directory.GetParent(Application.dataPath).FullName;
             string filepath = Path.Combine(directory, fileName);
-            Debug.Log(filepath);
             if (File.Exists(filepath))
             {
                 var commands = File.ReadAllLines(filepath);
