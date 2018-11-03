@@ -60,6 +60,19 @@ namespace CommandTerminal
             }
         }
 
+        public T AsEnum<T>()
+        {
+            try
+            {
+                return (T)Enum.Parse(typeof(T), String, true);
+            }
+            catch (ArgumentException)
+            {
+                TypeError(typeof(T).ToString());
+                return default (T);
+            }
+        }
+
         public override string ToString() {
             return String;
         }
