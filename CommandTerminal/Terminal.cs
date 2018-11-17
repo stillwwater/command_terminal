@@ -248,7 +248,8 @@ namespace CommandTerminal
 
             if (Event.current.Equals(Event.KeyboardEvent("escape"))) {
                 SetState(TerminalState.Close);
-            } else if (Event.current.Equals(Event.KeyboardEvent("return"))) {
+            } else if (Event.current.Equals(Event.KeyboardEvent("return"))
+                || Event.current.Equals(Event.KeyboardEvent("[enter]"))) {
                 EnterCommand();
             } else if (Event.current.Equals(Event.KeyboardEvent("up"))) {
                 command_text = History.Previous();
