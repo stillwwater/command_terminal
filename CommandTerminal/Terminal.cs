@@ -138,11 +138,11 @@ namespace CommandTerminal
             Autocomplete = new CommandAutocomplete();
 
             // Hook Unity log events
-            Application.logMessageReceived += HandleUnityLog;
+            Application.logMessageReceivedThreaded += HandleUnityLog;
         }
 
         void OnDisable() {
-            Application.logMessageReceived -= HandleUnityLog;
+            Application.logMessageReceivedThreaded -= HandleUnityLog;
         }
 
         void Start() {
