@@ -14,7 +14,7 @@ namespace CommandTerminal
         ShellMessage
     }
 
-    public struct LogItem
+    public class LogItem
     {
         public TerminalLogType type;
         public string message;
