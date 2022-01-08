@@ -71,3 +71,11 @@ static void FrontCommandAdd(CommandArg[] args) {
 ```csharp
 Terminal.Shell.AddCommand("add", CommandAdd, 2, 2, "Adds 2 numbers");
 ```
+
+## Remote Commands
+We can also send commands remotely, via HTTP.
+
+Attach the TerminalRemoteHTTPAccess.cs component to any gameObject (Be organized, put it on the one that already has the Terminal.cs) and enter playmode.
+
+
+You can use the browser (e.g. http://localhost:4444/?password=password&command=log%20hello%20world%20) or any other HTTP client to send your commands. All you need is the password and the command.
